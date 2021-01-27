@@ -2,6 +2,8 @@ package ru.itis.controllers;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.itis.dtos.CvDto;
 import ru.itis.models.Cv;
+import ru.itis.security.details.UserDetailsImpl;
 import ru.itis.services.interfaces.CvService;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class CvController {
     private final CvService cvService;
 
     @GetMapping("/new/cv")
+    @PreAuthorize("isAuthenticated()")
     public String newCvPage() {
         return "newCv";
     }
@@ -36,7 +40,8 @@ public class CvController {
     }
 
     @GetMapping("/update/cv/{id}")
-    public String updateCv(@PathVariable String id, Model model) {
+    @PreAuthorize("@securityUtils.isCvOwner(#userDetails, #id)")
+    public String updateCv(@PathVariable String id, @AuthenticationPrincipal UserDetailsImpl userDetails, Model model) {
         CvDto cvDto = CvDto.from(cvService.getCvById(id));
         model.addAttribute("id", id);
         model.addAttribute("name", cvDto.getName());
@@ -49,19 +54,24 @@ public class CvController {
     }
 
     @PostMapping("/new/cv")
-    public String addCv(CvDto cvDto) {
+    @PreAuthorize("isAuthenticated()")
+    public String addCv(CvDto cvDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        cvDto.setOwnerId(userDetails.getUser().get_id());
         cvService.publish(cvDto);
         return "redirect:/cvs";
     }
 
     @PostMapping("/update/cv/{id}")
-    public String updateCv(@PathVariable String id, CvDto cvDto) {
+    @PreAuthorize("@securityUtils.isCvOwner(#userDetails, #id)")
+    public String updateCv(@PathVariable String id, @AuthenticationPrincipal UserDetailsImpl userDetails, CvDto cvDto) {
+        cvDto.setOwnerId(userDetails.getUser().get_id());
         cvService.updateCv(cvDto, id);
         return "redirect:/cv/" + id;
     }
 
     @PostMapping("/delete/cv/{id}")
-    public String deleteCvById(@PathVariable String id) {
+    @PreAuthorize("@securityUtils.isCvOwner(#userDetails, #id)")
+    public String deleteCvById(@PathVariable String id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         cvService.deleteCvById(id);
         return "redirect:/cvs";
     }

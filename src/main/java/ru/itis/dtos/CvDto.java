@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CvDto {
+    private String ownerId;
+    // У полей произвольные значения
     private String name;
     private String surname;
     private String contacts;
@@ -24,6 +26,7 @@ public class CvDto {
     public static CvDto from(Cv cv) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return CvDto.builder()
+                .ownerId(cv.getOwnerId())
                 .name(cv.getName())
                 .surname(cv.getSurname())
                 .contacts(cv.getContacts())

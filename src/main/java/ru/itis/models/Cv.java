@@ -21,6 +21,7 @@ import java.util.List;
 public class Cv {
     @Id
     private String _id;
+    private String ownerId;
     // У полей произвольные значения
     private String name;
     private String surname;
@@ -32,6 +33,7 @@ public class Cv {
     public static Cv from(CvDto cvDto) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return Cv.builder()
+                .ownerId(cvDto.getOwnerId())
                 .name(cvDto.getName())
                 .surname(cvDto.getSurname())
                 .contacts(cvDto.getContacts())
