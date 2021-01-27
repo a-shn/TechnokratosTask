@@ -49,13 +49,21 @@ public class CvController {
     }
 
     @PostMapping("/new/cv")
-    public void addCv(CvDto cvDto) {
+    public String addCv(CvDto cvDto) {
         cvService.publish(cvDto);
+        return "redirect:/cvs";
     }
 
     @PostMapping("/update/cv/{id}")
-    public void updateCv(@PathVariable String id, CvDto cvDto) {
+    public String updateCv(@PathVariable String id, CvDto cvDto) {
         cvService.updateCv(cvDto, id);
+        return "redirect:/cv/" + id;
+    }
+
+    @PostMapping("/delete/cv/{id}")
+    public String deleteCvById(@PathVariable String id) {
+        cvService.deleteCvById(id);
+        return "redirect:/cvs";
     }
 
     @GetMapping("/api/cv/{id}")
@@ -66,10 +74,5 @@ public class CvController {
     @GetMapping("/api/cvs")
     public @ResponseBody ResponseEntity<List<Cv>> getCvsAsJson() {
         return ResponseEntity.ok(cvService.getCvs());
-    }
-
-    @PostMapping("/api/delete/cv/{id}")
-    public void deleteCvById(@PathVariable String id) {
-        cvService.deleteCvById(id);
     }
 }

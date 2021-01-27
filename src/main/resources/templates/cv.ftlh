@@ -52,7 +52,7 @@
 Обо мне:
 <div id="aboutMe"></div>
 <br>
-<form method="post" action="/api/delete/cv/${id}">
+<form method="post" action="/delete/cv/${id}">
     <input type="submit" id="btn" value="Удалить">
 </form>
 <form method="get" action="/update/cv/${id}">
